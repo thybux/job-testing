@@ -1,10 +1,17 @@
 {
-  "name": "${PROJECT_NAME}",
+  "name": "@pandalab/test",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Projet TypeScript pour refactorisation d'envoi d'emails",
+  "main": "dist/main.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "run": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "start": "npm run clean && npm run build && npm run run"
   },
-  "private": true
+  "dependencies": {
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {}
 }

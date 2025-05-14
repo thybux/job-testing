@@ -19,7 +19,7 @@ Le temps indicatif pour résoudre l'exercice est d'environ 2 heures, mais il est
 - Précisez également ce que vous auriez fait si vous aviez eu plus de temps.
 
 
-### chose que j'ai modifié
+### Modification
 
 - le return de chaque fonction de message
 - convention de nommage de sendnewDeviceEmail -> sendNewDeviceEmail

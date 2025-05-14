@@ -18,3 +18,13 @@ Le temps indicatif pour résoudre l'exercice est d'environ 2 heures, mais il est
 - Dans la demande de fusion, indiquez vos axes de réflexion principaux.
 - Précisez également ce que vous auriez fait si vous aviez eu plus de temps.
 
+
+### chose que j'ai modifié
+
+- le return de chaque fonction de message
+- convention de nommage de sendnewDeviceEmail -> sendNewDeviceEmail
+- ajout d'une interface IUser et de l'enum de EmailTemplate 
+- ajout d'une map pour dans le cas d'un ajout de template + flexible
+- ajout (porté des méthode private public etc ...)
+- ajout d'une méthode pour enregistrer une nouvelle template ( + flexible)
+

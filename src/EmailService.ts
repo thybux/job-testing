@@ -1,53 +1,102 @@
+// service des email
 export class EmailService {
-  sendEmail(user: any, template: string) {
-    let message = '';
-    if (template === 'welcome') {
-      message = this.sendWelcomeEmail(user);
-    } else if (template === 'newDevice') {
-      message = this.sendnewDeviceEmail(user);
-    } else if (template === 'unreadMessages') {
-      message = this.sendUnreadMessagesEmail(user);
+
+  // ajout de l'email validator avant d'envoyer l'email
+  private emailValidator: EmailValidator;
+
+  // une map qui va return la string d'une template
+  private handlerTemplate: Map<string, (user: User) => string>
+
+  constructor() {
+    this.emailValidator = new EmailValidator();
+
+    this.handlerTemplate = new Map([
+        [EmailTemplate.WELCOME, this.sendWelcomeEmail.bind(this)],
+        [EmailTemplate.NEW_DEVICE, this.sendNewDeviceEmail.bind(this)],
+        [EmailTemplate.UNREAD_MESSAGES, this.sendUnreadMessagesEmail.bind(this)]
+    ]);
+  }
+
+  sendEmail(user: User, template: string) {
+    try{
+      // on valide l'email de l'utilisateur avant de tenter d'envoyer le mail
+      this.emailValidator.validateUser(user);
+
+      // me return la fonction lié à la template
+      let messageHandler = this.handlerTemplate.get(template);
+      if (!messageHandler) {
+        throw new Error(
+          `pas de template disponible ${template}. liste des templates possible => ${Array.from(this.handlerTemplate.keys())}`
+        )
+      }
+      const message = messageHandler(user);
+      this.send(user, message);
+    } catch (e) {
+      // affichage de l'erreur reel pratique pour le debug
+      console.error(e);
     }
-    this.send(user, message);
   }
 
-  sendWelcomeEmail(user: any) {
-    const message = `Bienvenue ${user.name} 🐼, Votre compte a bien été crée sur PandaLab Pro`;
-    return message;
+  regiterNewTemplate(template: string, handler: (user: User) => string) {
+    this.handlerTemplate.set(template, handler);
   }
 
-  sendnewDeviceEmail(user: any) {
-    const message = `Bonjour ${user.name} 🐼, Un nouvel appareil vient de se connecter à votre compte`;
-    return message;
+  private sendWelcomeEmail(user: User) {
+    return `Bienvenue ${user.name} 🐼, Votre compte a bien été crée sur PandaLab Pro`;
   }
 
-  sendUnreadMessagesEmail(user: any) {
+  private sendNewDeviceEmail(user: User) {
+    return `Bonjour ${user.name} 🐼, Un nouvel appareil vient de se connecter à votre compte`;
+  }
+
+  private sendUnreadMessagesEmail(user: User) {
     const unreadMessagesCount = user.unreadMessages || 0;
-    const message = `Bonjour ${user.name} 🐼, vous avez ${unreadMessagesCount} messages non lus.`;
-    return message;
+    return `Bonjour ${user.name} 🐼, vous avez ${unreadMessagesCount} messages non lus.`;
   }
 
-  send(user: any, message: string) {
+  private send(user: User, message: string) {
     console.log(`Sending email to ${user.email}: ${message}`);
   }
 }
 
-export class User {
-  constructor(public name: string, public email: string, public unreadMessages: number) {}
+export class User implements IUser{
+
+  constructor(
+      public name: string,
+      public email: string,
+      public unreadMessages: number
+  ) {}
 
   markMessagesAsRead() {
     this.unreadMessages = 0;
   }
 }
 
+
 export class EmailValidator {
-  validateEmail(user: any) {
-    if (!user.email.includes('@')) {
+  validateEmail(email: string) {
+    if (!email.includes('@')) {
       throw new Error('Invalid email address');
     }
+    return true;
   }
 
-  validateUser(user: any) {
-    this.validateEmail(user);
+  validateUser(user: IUser) {
+    this.validateEmail(user.email);
   }
+}
+
+
+// ajout d'un enum pour les templates
+enum EmailTemplate {
+  WELCOME = 'welcome',
+  NEW_DEVICE = 'newDevice',
+  UNREAD_MESSAGES = 'unreadMessages'
+}
+
+// interface IUSER
+export interface IUser {
+  name: string;
+  email: string;
+  unreadMessages: number;
 }
